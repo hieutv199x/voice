@@ -41,10 +41,17 @@ COPY . .
 RUN mkdir -p sample
 
 # Download models from Hugging Face during build
-RUN python3 -c "from huggingface_hub import snapshot_download; \
+# Use HF_HUB_ENABLE_HF_TRANSFER for faster downloads
+ENV HF_HUB_ENABLE_HF_TRANSFER=1
+RUN pip3 install --no-cache-dir hf-transfer && \
+    python3 -c "from huggingface_hub import snapshot_download; \
+    print('Downloading VieNeu-TTS model...'); \
     snapshot_download(repo_id='pnnbao-ump/VieNeu-TTS', cache_dir='/root/.cache/huggingface'); \
+    print('Downloading NeuCodec model...'); \
     snapshot_download(repo_id='neuphonic/neucodec', cache_dir='/root/.cache/huggingface'); \
-    print('✅ Models downloaded successfully')"
+    print('✅ Models downloaded successfully')" && \
+    pip3 uninstall -y hf-transfer && \
+    rm -rf /tmp/* /var/tmp/*
 
 # Expose port
 EXPOSE 8000
