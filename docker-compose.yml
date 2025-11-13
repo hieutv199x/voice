@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  vieneu-tts-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: vieneu-tts-api:latest
+    container_name: vieneu-tts-api
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount sample directory for voice samples
+      - ./sample:/app/sample:ro
+      # Optional: Mount cache for Hugging Face models
+      - huggingface-cache:/root/.cache/huggingface
+    environment:
+      - CUDA_VISIBLE_DEVICES=0  # Specify which GPU to use
+      - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
+    restart: unless-stopped
+    
+    # GPU support - choose one of the deployment configurations below
+    
+    # Option 1: Using Docker Compose V2.3+ with NVIDIA runtime (recommended)
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1  # Number of GPUs
+              capabilities: [gpu]
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  huggingface-cache:
+    driver: local

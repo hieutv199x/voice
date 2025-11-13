@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  vieneu-tts-api-cpu:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: vieneu-tts-api:latest
+    container_name: vieneu-tts-api-cpu
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./sample:/app/sample:ro
+      - huggingface-cache:/root/.cache/huggingface
+    environment:
+      - CUDA_VISIBLE_DEVICES=""  # Disable GPU
+    restart: unless-stopped
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  huggingface-cache:
+    driver: local

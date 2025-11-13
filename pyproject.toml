@@ -1,0 +1,28 @@
+[tool.uv]
+index-strategy = "unsafe-best-match"
+
+[[tool.uv.index]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cu118"
+
+[project]
+name = "VieNeuTTS"
+version = "0.1.0"
+description = "VieNeuTTS - TTS for Vietnamese language"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "phonemizer>=3.3.0",
+    "torch",
+    "torchvision",
+    "torchaudio",
+    "huggingface-hub[cli]>=0.36.0",
+    "neucodec>=0.0.4",
+    "librosa>=0.11.0",
+    "gradio>=5.49.1",
+]
+
+[tool.uv.sources]
+torch = { index = "pytorch" }
+torchvision = { index = "pytorch" }
+torchaudio = { index = "pytorch" }
